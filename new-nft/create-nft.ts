@@ -14,6 +14,7 @@ import {
   generateSigner,
   keypairIdentity,
   percentAmount,
+  publicKey,
 } from "@metaplex-foundation/umi";
 
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
@@ -40,29 +41,35 @@ umi.use(mplTokenMetadata());
 const umiUser = umi.eddsa.createKeypairFromSecretKey(user.secretKey);
 umi.use(keypairIdentity(umiUser));
 
-console.log(`Set up Umi instance with user keypair`);
+console.log(`Set up Umi instance with user instance`);
 
-const collectionMint = generateSigner(umi);
+const collectionAddress = publicKey(
+  "75V3686FXWNBZDytwGbHSdsNfdT31EJxTSVXsSBB2oCT"
+);
+
+console.log(`Creating NFT...`);
+
+const mint = generateSigner(umi);
+
 const transaction = await createNft(umi, {
-  mint: collectionMint,
-  name: "My NFT Collection",
-  symbol: "MBC",
-  uri: "https://raw.githubusercontent.com/BintangDiLangit/bootcamp-sol/refs/heads/master/new-nft/assets/collection.json",
+  mint,
+  name: "My NFT",
+  uri: "https://raw.githubusercontent.com/BintangDiLangit/bootcamp-sol/refs/heads/master/new-nft/assets/nft/metadata_1/nft_1.json",
   sellerFeeBasisPoints: percentAmount(0),
-  isCollection: true,
+  collection: {
+    key: collectionAddress,
+    verified: false,
+  },
 });
 
 await transaction.sendAndConfirm(umi);
 
-const createCollectionNft = await fetchDigitalAsset(
-  umi,
-  collectionMint.publicKey
-);
+const createdNft = await fetchDigitalAsset(umi, mint.publicKey);
 
 console.log(
-  `Created collection, Address is ${getExplorerLink(
+  `Created NFT! Address is ${getExplorerLink(
     "address",
-    createCollectionNft.mint.publicKey,
+    createdNft.mint.publicKey,
     "devnet"
   )}`
 );

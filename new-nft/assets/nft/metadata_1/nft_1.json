@@ -1,0 +1,11 @@
+{
+    "name": "MBC Cyber Guardian",
+    "description": "A futuristic AI sentinel protecting the blockchain revolution.",
+    "image": "https://raw.githubusercontent.com/BintangDiLangit/bootcamp-sol/refs/heads/master/new-nft/assets/nft/metadata_1/mbc_nft_cyber_guardian_1.jpeg",
+    "attributes": [
+      { "trait_type": "Glowing Eyes", "value": "Neon Purple" },
+      { "trait_type": "Armor", "value": "Cybernetic Gold" },
+      { "trait_type": "Background", "value": "Digital Matrix Grid" },
+      { "trait_type": "Rarity", "value": "Legendary" }
+    ]
+  }
