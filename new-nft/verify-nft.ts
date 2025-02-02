@@ -1,7 +1,7 @@
 import {
-  createNft,
-  fetchDigitalAsset,
+  findMetadataPda,
   mplTokenMetadata,
+  verifyCollectionV1,
 } from "@metaplex-foundation/mpl-token-metadata";
 
 import {
@@ -10,12 +10,7 @@ import {
   getKeypairFromFile,
 } from "@solana-developers/helpers";
 
-import {
-  generateSigner,
-  keypairIdentity,
-  percentAmount,
-  publicKey,
-} from "@metaplex-foundation/umi";
+import { keypairIdentity, publicKey } from "@metaplex-foundation/umi";
 
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 
@@ -41,36 +36,26 @@ umi.use(mplTokenMetadata());
 const umiUser = umi.eddsa.createKeypairFromSecretKey(user.secretKey);
 umi.use(keypairIdentity(umiUser));
 
-console.log(`Set up Umi instance with user instance`);
+console.log(`Set up Umi instance with user keypair`);
 
 const collectionAddress = publicKey(
   "75V3686FXWNBZDytwGbHSdsNfdT31EJxTSVXsSBB2oCT"
 );
 
-console.log(`Creating NFT...`);
+const nftAddress = publicKey("3pUaNynDmS4L7ndXhidKJxSFPtaRjoETD7JUsQ1f7LDp");
 
-const mint = generateSigner(umi);
-
-const transaction = await createNft(umi, {
-  mint,
-  name: "MBC Cyber Guardian",
-  symbol: "MBCG",
-  uri: "https://raw.githubusercontent.com/BintangDiLangit/bootcamp-sol/refs/heads/master/new-nft/assets/nft/metadata_1/nft_1.json",
-  sellerFeeBasisPoints: percentAmount(0),
-  collection: {
-    key: collectionAddress,
-    verified: false,
-  },
+const transaction = await verifyCollectionV1(umi, {
+  metadata: findMetadataPda(umi, { mint: nftAddress }),
+  collectionMint: collectionAddress,
+  authority: umi.identity,
 });
 
-await transaction.sendAndConfirm(umi);
-
-const createdNft = await fetchDigitalAsset(umi, mint.publicKey);
+transaction.sendAndConfirm(umi);
 
 console.log(
-  `Created NFT! Address is ${getExplorerLink(
+  `NFT ${nftAddress} verified as member of collection ${collectionAddress}! See Explorer at ${getExplorerLink(
     "address",
-    createdNft.mint.publicKey,
+    nftAddress,
     "devnet"
   )}`
 );
